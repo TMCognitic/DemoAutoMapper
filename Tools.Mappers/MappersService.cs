@@ -7,18 +7,21 @@ using System.Reflection;
 
 namespace Tools.Mappers
 {
-    public class MappersService
+    public abstract partial class MappersService : IMappersService
     {
         private Dictionary<Binder, Func<object, object>> _mappers;
 
         public MappersService()
         {
             _mappers = new Dictionary<Binder, Func<object, object>>();
+            ConfigureMappers(this);
         }
+
+        protected abstract void ConfigureMappers(IMappersService service);
 
         private static TResult DefaultMapper<TSource, TResult>(TSource source)
             where TSource : class
-        {            
+        {
             Type sourceType = source.GetType();
             Type resultType = typeof(TResult);
 
@@ -28,7 +31,7 @@ namespace Tools.Mappers
             IEnumerable<PropertyInfo> sourceProperties = source.GetType().GetProperties().ToArray();
             TResult result = (TResult)Activator.CreateInstance(resultType);
 
-            foreach(PropertyInfo propertyInfo in resultType.GetProperties())
+            foreach (PropertyInfo propertyInfo in resultType.GetProperties())
             {
                 string propertyName = propertyInfo.Name;
 
@@ -37,7 +40,7 @@ namespace Tools.Mappers
                     propertyName = mapAttribute.PropertyName;
 
                 PropertyInfo sourceProperty = sourceProperties.Where(p => p.Name == propertyName).SingleOrDefault();
-                if(!(sourceProperty is null))
+                if (!(sourceProperty is null))
                 {
                     propertyInfo.SetMethod.Invoke(result, new object[] { sourceProperty.GetMethod.Invoke(source, null) });
                 }
@@ -64,26 +67,12 @@ namespace Tools.Mappers
             }
         }
 
-        public void Register<TSource, TResult>(Func<TSource, TResult> mapper)
-            where TSource : class
-            where TResult : class
+        void IMappersService.Register<TSource, TResult>(Func<TSource, TResult> mapper)
         {
             if (mapper is null)
                 throw new ArgumentNullException();
 
             _mappers.Add(new Binder(typeof(TSource), typeof(TResult)), (source) => mapper((TSource)source));
-        }
-
-        private struct Binder
-        {
-            public Type SourceType { get; private set; }
-            public Type ResultType { get; private set; }
-
-            public Binder(Type sourceType, Type resultType)
-            {
-                SourceType = sourceType;
-                ResultType = resultType;
-            }
         }
     }
 }

@@ -11,8 +11,9 @@ namespace TestMappers
         public int Id { get; set; }
         [Map("LastName")]
         public string Nom { get; set; }
-        public string FirstName { get; set; }
-
-        public IEnumerable<string> Phones { get; set; }
+        [Map("FirstName")]
+        public string Prenom { get; set; }
+        [Map("Phones")]
+        public IEnumerable<string> Tels { get; set; }
     }
 }
