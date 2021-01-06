@@ -7,7 +7,7 @@ namespace TestMappers
     {
         static void Main(string[] args)
         {
-            Mappers mappersService = new Mappers();
+            IMappersService mappersService = new Mappers();
 
             Source source = new Source() { Id = 1, LastName = "Doe", FirstName = "John", Phones = new string[] { "50523219", "50528963", "50516927" } };
 

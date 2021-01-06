@@ -36,11 +36,11 @@ namespace Tools.Mappers
                 string propertyName = propertyInfo.Name;
 
                 MapAttribute mapAttribute = propertyInfo.GetCustomAttribute<MapAttribute>();
-                if (!(mapAttribute is null))
+                if (mapAttribute is not null)
                     propertyName = mapAttribute.PropertyName;
 
                 PropertyInfo sourceProperty = sourceProperties.Where(p => p.Name == propertyName).SingleOrDefault();
-                if (!(sourceProperty is null))
+                if (sourceProperty is not null)
                 {
                     propertyInfo.SetMethod.Invoke(result, new object[] { sourceProperty.GetMethod.Invoke(source, null) });
                 }
@@ -51,6 +51,7 @@ namespace Tools.Mappers
 
         public TResult Map<TSource, TResult>(TSource source)
             where TSource : class
+            where TResult : class
         {
             if (source is null)
                 throw new ArgumentNullException(nameof(source));
